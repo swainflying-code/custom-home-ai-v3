@@ -252,7 +252,7 @@ def show_customer_diagnosis_page():
                     from core.database import db
                     # 映射到数据库字段
                     db_data = customer_data.copy()
-                    record_id = db.insert("customers", db_data)
+                    record_id = db.insert("customers_v3", db_data)
                     st.success(f"✅ 客户信息已保存！编号：{customer_no}，ID：{record_id}")
                 except Exception as e:
                     st.warning(f"⚠️ 数据库保存失败（{str(e)[:60]}），AI分析仍可正常使用")
