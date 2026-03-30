@@ -331,7 +331,7 @@ def _show_settings():
                         from core.database import db
                         from core.auth import AuthManager
                         auth = AuthManager()
-                        pwd_hash = auth.hash_password(new_password)
+                        pwd_hash = auth.generate_password_hash(new_password)
 
                         # 检查用户名是否已存在
                         existing = db.client.table("users").select("*").eq("username", new_username).execute()
