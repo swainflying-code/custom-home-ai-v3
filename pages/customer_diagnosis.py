@@ -21,7 +21,7 @@ def generate_customer_no() -> str:
 def show_customer_diagnosis_page():
     st.markdown("""
     <div style="padding: 16px 0 8px 0;">
-        <h2 style="margin:0; color: #1a1a1a;">🎯 客户诊断引擎</h2>
+        <h2 style="margin:0; color: #1a1a1a;">🎯 客户诊断</h2>
         <p style="margin:4px 0 0 0; color:#666;">结构化采集需求，输出客户画像、预算敏感度、风格倾向与成交风险</p>
     </div>
     """, unsafe_allow_html=True)
@@ -34,7 +34,7 @@ def show_customer_diagnosis_page():
     if "diag_detail_result" not in st.session_state:
         st.session_state.diag_detail_result = ""
 
-    tab1, tab2 = st.tabs(["📋 客户信息录入", "🤖 AI 分析结果"])
+    tab1, tab2, tab3 = st.tabs(["📋 客户信息录入", "🤖 AI 分析结果", "📊 客户记录列表"])
 
     # ============================================================
     # TAB 1 - 表单录入
@@ -305,6 +305,15 @@ def show_customer_diagnosis_page():
 {card_result}
             </div>
             """, unsafe_allow_html=True)
+            # 一键复制主卡
+            col_copy1, col_regen1 = st.columns([1, 1])
+            with col_copy1:
+                st.code(card_result, language=None)
+            with col_regen1:
+                if st.button("🔄 重新生成主卡", key="regen_card"):
+                    st.session_state.diag_card_result = ""
+                    st.rerun()
+            st.caption("💡 点击上方代码框右上角的复制图标，即可一键复制全文")
         else:
             if st.button("▶ 生成主卡分析", type="primary"):
                 with st.spinner("🤖 分析中..."):
@@ -327,9 +336,14 @@ def show_customer_diagnosis_page():
 {detail_result}
             </div>
             """, unsafe_allow_html=True)
-            if st.button("🔄 重新生成详情分析"):
-                st.session_state.diag_detail_result = ""
-                st.rerun()
+            col_copy2, col_regen2 = st.columns([1, 1])
+            with col_copy2:
+                st.code(detail_result, language=None)
+            with col_regen2:
+                if st.button("🔄 重新生成详情分析", key="regen_detail"):
+                    st.session_state.diag_detail_result = ""
+                    st.rerun()
+            st.caption("💡 点击上方代码框右上角的复制图标，即可一键复制全文")
         else:
             if card_result:
                 if st.button("▶ 展开详情分析", type="secondary"):
@@ -344,3 +358,106 @@ def show_customer_diagnosis_page():
                             st.error(f"❌ {str(e)}")
             else:
                 st.info("💡 请先生成主卡分析，再展开详情分析")
+
+    # ============================================================
+    # TAB 3 - 客户记录列表
+    # ============================================================
+    with tab3:
+        st.markdown("### 📊 客户记录列表")
+
+        # 筛选栏
+        col_f1, col_f2, col_f3, col_f4 = st.columns([2, 2, 2, 1])
+        with col_f1:
+            filter_intent = st.selectbox("意向等级", ["全部", "高", "中", "低"], key="list_filter_intent")
+        with col_f2:
+            filter_days = st.selectbox("时间范围", ["全部", "今天", "近3天", "近7天", "近30天"], key="list_filter_days")
+        with col_f3:
+            filter_name = st.text_input("搜索姓名", placeholder="输入客户姓名", key="list_filter_name")
+        with col_f4:
+            st.markdown("<br>", unsafe_allow_html=True)
+            refresh_btn = st.button("🔄 刷新", use_container_width=True, key="list_refresh")
+
+        # 加载数据
+        try:
+            from core.database import db
+            from datetime import datetime, timedelta
+
+            customers = db.select("customers_v3", order_by="created_at.desc", limit=200)
+
+            # 本地筛选
+            if filter_intent != "全部":
+                customers = [c for c in customers if c.get("intent_level", "") == filter_intent]
+            if filter_name.strip():
+                customers = [c for c in customers if filter_name.strip() in (c.get("customer_name") or "")]
+            if filter_days != "全部":
+                days_map = {"今天": 1, "近3天": 3, "近7天": 7, "近30天": 30}
+                cutoff = datetime.now() - timedelta(days=days_map[filter_days])
+                def _in_range(c):
+                    ts = c.get("created_at", "")
+                    if not ts:
+                        return False
+                    try:
+                        t = datetime.fromisoformat(ts.replace("Z", "+00:00")).replace(tzinfo=None)
+                        return t >= cutoff
+                    except Exception:
+                        return True
+                customers = [c for c in customers if _in_range(c)]
+
+            if not customers:
+                st.info("暂无客户记录，快去录入第一个客户吧！")
+            else:
+                st.markdown(f"共 **{len(customers)}** 条记录")
+                st.markdown("---")
+
+                # 意向标签颜色
+                intent_badge = {
+                    "高": "🟢 高意向",
+                    "中": "🟡 中意向",
+                    "低": "🔴 低意向",
+                }
+
+                for idx, c in enumerate(customers):
+                    intent = c.get("intent_level", "-")
+                    badge = intent_badge.get(intent, f"⚪ {intent}")
+                    name = c.get("customer_name", "-")
+                    no = c.get("customer_no", "-")
+                    budget = c.get("budget_range", "-")
+                    source = c.get("source_channel", "-")
+                    next_step = c.get("next_step", "-")
+                    created = (c.get("created_at") or "")[:16].replace("T", " ")
+                    ai_done = "✅" if c.get("ai_card_result") else "—"
+                    spaces_raw = c.get("custom_spaces") or []
+                    spaces = " / ".join(spaces_raw) if spaces_raw else "-"
+
+                    with st.expander(
+                        f"**{name}**　{badge}　预算：{budget}　{no}　{created}",
+                        expanded=False
+                    ):
+                        col_a, col_b, col_c = st.columns(3)
+                        with col_a:
+                            st.markdown(f"**来源渠道：** {source}")
+                            st.markdown(f"**定制空间：** {spaces}")
+                            st.markdown(f"**联系方式：** {c.get('contact', '-')}")
+                        with col_b:
+                            st.markdown(f"**装修阶段：** {c.get('renovation_stage', '-')}")
+                            st.markdown(f"**下单时间：** {c.get('order_timeline', '-')}")
+                            st.markdown(f"**决策人：** {c.get('decision_maker', '-')}")
+                        with col_c:
+                            st.markdown(f"**下一步：** {next_step}")
+                            st.markdown(f"**跟进日期：** {c.get('next_followup_date', '-')}")
+                            st.markdown(f"**AI 分析：** {ai_done}")
+
+                        if c.get("sales_note"):
+                            st.markdown(f"**销售备注：** {c.get('sales_note')}")
+
+                        # 快捷操作：加载到 AI 分析
+                        if st.button(f"🤖 查看/重新分析此客户", key=f"load_customer_{idx}"):
+                            st.session_state.diag_customer_data = c
+                            st.session_state.diag_card_result = c.get("ai_card_result", "")
+                            st.session_state.diag_detail_result = c.get("ai_detail_result", "")
+                            st.success(f"已加载「{name}」的数据，请切换到「AI 分析结果」标签")
+
+        except Exception as e:
+            st.warning(f"⚠️ 无法加载客户记录（{str(e)[:80]}）")
+            st.info("请确认数据库连接正常，或先录入几条客户数据")
+

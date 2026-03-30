@@ -108,7 +108,7 @@ def init_session():
     defaults = {
         'logged_in': False,
         'user_info': None,
-        'current_page': '客户诊断引擎',
+        'current_page': '客户诊断',
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -205,7 +205,7 @@ def show_main():
             st.markdown("---")
 
             # 导航菜单
-            pages = ["客户诊断引擎", "方案引导引擎", "预算锚定引擎", "成交推进引擎", "数据统计", "系统设置"]
+            pages = ["客户诊断", "方案引导", "预算锚定", "成交推进", "数据统计", "系统设置"]
             icons = ["clipboard2-pulse", "palette2", "cash-coin", "rocket-takeoff", "graph-up-arrow", "gear"]
             current_idx = pages.index(selected_page) if selected_page in pages else 0
 
@@ -247,8 +247,8 @@ def show_main():
             # 快速数据
             try:
                 from core.database import db
-                total = db.count("customers")
-                high = db.count("customers", {"intent_level": "高意向（1个月内）"})
+                total = db.count("customers_v3")
+                high = db.count("customers_v3", {"intent_level": "高"})
                 st.metric("📋 总客户", total)
                 st.metric("🟢 高意向", high)
             except Exception:
@@ -265,19 +265,19 @@ def show_main():
 
     # 路由到各引擎
     try:
-        if selected_page == "客户诊断引擎":
+        if selected_page == "客户诊断":
             from pages.customer_diagnosis import show_customer_diagnosis_page
             show_customer_diagnosis_page()
 
-        elif selected_page == "方案引导引擎":
+        elif selected_page == "方案引导":
             from pages.solution_guide import show_solution_guide_page
             show_solution_guide_page()
 
-        elif selected_page == "预算锚定引擎":
+        elif selected_page == "预算锚定":
             from pages.budget_anchor import show_budget_anchor_page
             show_budget_anchor_page()
 
-        elif selected_page == "成交推进引擎":
+        elif selected_page == "成交推进":
             from pages.deal_push import show_deal_push_page
             show_deal_push_page()
 
