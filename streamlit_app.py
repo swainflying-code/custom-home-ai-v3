@@ -190,7 +190,7 @@ def show_login():
 # 主应用
 # ============================================================
 def show_main():
-    selected_page = st.session_state.get('current_page', '客户诊断引擎')
+    selected_page = st.session_state.get('current_page', '客户诊断')
 
     try:
         with st.sidebar:

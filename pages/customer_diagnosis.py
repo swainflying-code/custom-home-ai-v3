@@ -359,6 +359,25 @@ def show_customer_diagnosis_page():
             else:
                 st.info("💡 请先生成主卡分析，再展开详情分析")
 
+        # ── 跳转方案引导（A → B 打通） ───────────────────────────
+        if card_result:
+            st.markdown("---")
+            col_go, _ = st.columns([2, 3])
+            with col_go:
+                if st.button(
+                    "🎨 进入方案引导 →",
+                    type="primary",
+                    use_container_width=True,
+                    key="goto_solution_guide",
+                    help="将当前客户数据传导到「方案引导」板块，生成设计方案分析"
+                ):
+                    # 把 AI 分析结果也存到客户数据里，供方案引导的①传导块显示
+                    customer_with_ai = st.session_state.diag_customer_data.copy()
+                    customer_with_ai["ai_card_result"] = card_result
+                    st.session_state.diag_customer_data = customer_with_ai
+                    st.session_state["current_page"] = "方案引导"
+                    st.rerun()
+
     # ============================================================
     # TAB 3 - 客户记录列表
     # ============================================================
