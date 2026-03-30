@@ -425,8 +425,27 @@ def show_customer_diagnosis_page():
             if not customers:
                 st.info("暂无客户记录，快去录入第一个客户吧！")
             else:
-                st.markdown(f"共 **{len(customers)}** 条记录")
+                # 统计卡片
+                col_m1, col_m2, col_m3, col_m4 = st.columns(4)
+                total_count = len(customers)
+                high_count = sum(1 for c in customers if c.get("intent_level") == "高")
+                mid_count = sum(1 for c in customers if c.get("intent_level") == "中")
+                low_count = sum(1 for c in customers if c.get("intent_level") == "低")
+
+                with col_m1:
+                    st.metric("总客户数", total_count)
+                with col_m2:
+                    st.metric("🟢 高意向", high_count)
+                with col_m3:
+                    st.metric("🟡 中意向", mid_count)
+                with col_m4:
+                    st.metric("🔴 低意向", low_count)
+
                 st.markdown("---")
+                st.markdown(f"共 **{len(customers)}** 条记录")
+
+                # 表格
+                import pandas as pd
 
                 # 意向标签颜色
                 intent_badge = {
@@ -435,6 +454,7 @@ def show_customer_diagnosis_page():
                     "低": "🔴 低意向",
                 }
 
+                table_data = []
                 for idx, c in enumerate(customers):
                     intent = c.get("intent_level", "-")
                     badge = intent_badge.get(intent, f"⚪ {intent}")
@@ -448,33 +468,78 @@ def show_customer_diagnosis_page():
                     spaces_raw = c.get("custom_spaces") or []
                     spaces = " / ".join(spaces_raw) if spaces_raw else "-"
 
-                    with st.expander(
-                        f"**{name}**　{badge}　预算：{budget}　{no}　{created}",
-                        expanded=False
-                    ):
+                    table_data.append({
+                        "客户姓名": name,
+                        "意向": badge,
+                        "客户编号": no,
+                        "预算": budget,
+                        "来源": source,
+                        "定制空间": spaces,
+                        "联系方式": c.get("contact", "-"),
+                        "创建时间": created,
+                        "AI分析": ai_done,
+                        "操作": idx,
+                    })
+
+                df = pd.DataFrame(table_data)
+
+                # 自定义列宽
+                column_config = {
+                    "客户姓名": st.column_config.Column(width=100),
+                    "意向": st.column_config.Column(width=100),
+                    "客户编号": st.column_config.Column(width=140),
+                    "预算": st.column_config.Column(width=100),
+                    "来源": st.column_config.Column(width=100),
+                    "定制空间": st.column_config.Column(width=150),
+                    "联系方式": st.column_config.Column(width=120),
+                    "创建时间": st.column_config.Column(width=150),
+                    "AI分析": st.column_config.Column(width=80),
+                    "操作": st.column_config.Column(width=120),
+                }
+
+                st.dataframe(
+                    df,
+                    column_config=column_config,
+                    hide_index=True,
+                    use_container_width=True,
+                )
+
+                # 详情展开（点击表格行后显示）
+                if st.session_state.get("selected_customer_idx") is not None:
+                    sel_idx = st.session_state["selected_customer_idx"]
+                    if 0 <= sel_idx < len(customers):
+                        c = customers[sel_idx]
+                        st.markdown("---")
+                        st.markdown("### 📋 客户详情")
                         col_a, col_b, col_c = st.columns(3)
                         with col_a:
-                            st.markdown(f"**来源渠道：** {source}")
-                            st.markdown(f"**定制空间：** {spaces}")
+                            st.markdown(f"**客户编号：** {c.get('customer_no', '-')}")
+                            st.markdown(f"**客户姓名：** {c.get('customer_name', '-')}")
                             st.markdown(f"**联系方式：** {c.get('contact', '-')}")
+                            st.markdown(f"**来源渠道：** {c.get('source_channel', '-')}")
                         with col_b:
+                            st.markdown(f"**预算范围：** {c.get('budget_range', '-')}")
                             st.markdown(f"**装修阶段：** {c.get('renovation_stage', '-')}")
                             st.markdown(f"**下单时间：** {c.get('order_timeline', '-')}")
                             st.markdown(f"**决策人：** {c.get('decision_maker', '-')}")
                         with col_c:
-                            st.markdown(f"**下一步：** {next_step}")
+                            st.markdown(f"**下一步：** {c.get('next_step', '-')}")
                             st.markdown(f"**跟进日期：** {c.get('next_followup_date', '-')}")
-                            st.markdown(f"**AI 分析：** {ai_done}")
+                            st.markdown(f"**AI 分析状态：** {'✅ 已完成' if c.get('ai_card_result') else '— 未分析'}")
 
                         if c.get("sales_note"):
                             st.markdown(f"**销售备注：** {c.get('sales_note')}")
 
-                        # 快捷操作：加载到 AI 分析
-                        if st.button(f"🤖 查看/重新分析此客户", key=f"load_customer_{idx}"):
-                            st.session_state.diag_customer_data = c
-                            st.session_state.diag_card_result = c.get("ai_card_result", "")
-                            st.session_state.diag_detail_result = c.get("ai_detail_result", "")
-                            st.success(f"已加载「{name}」的数据，请切换到「AI 分析结果」标签")
+                        st.markdown("---")
+                        col_load, _ = st.columns([2, 3])
+                        with col_load:
+                            if st.button(f"🤖 加载此客户到分析", key=f"load_customer_detail_{sel_idx}", use_container_width=True):
+                                st.session_state.diag_customer_data = c
+                                st.session_state.diag_card_result = c.get("ai_card_result", "")
+                                st.session_state.diag_detail_result = c.get("ai_detail_result", "")
+                                st.session_state["selected_customer_idx"] = None
+                                st.success(f"已加载「{c.get('customer_name')}」的数据，请切换到「AI 分析结果」标签")
+                                st.rerun()
 
         except Exception as e:
             st.warning(f"⚠️ 无法加载客户记录（{str(e)[:80]}）")
