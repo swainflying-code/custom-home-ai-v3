@@ -207,15 +207,30 @@ class AIService:
         try:
             customer_info = self._format_customer_info(customer_data)
             prompt = PROMPT_CARD.replace("{customer_info}", customer_info)
+            
+            # 调试：打印请求信息
+            logger.info(f"analyze_card 请求: 模型={self.model}, prompt长度={len(prompt)}")
+            
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
-                max_tokens=800
+                max_tokens=1000  # 增加到 1000 个 token
             )
-            return response.choices[0].message.content or "AI返回为空"
+            
+            result = response.choices[0].message.content or "AI返回为空"
+            
+            # 调试：打印响应信息
+            logger.info(f"analyze_card 响应: 长度={len(result)}, 是否完成={not response.choices[0].finish_reason == 'length'}")
+            
+            # 检查是否因长度被截断
+            if response.choices[0].finish_reason == 'length':
+                logger.warning(f"AI 响应被长度截断，可能需要增加 max_tokens")
+                result += "\n\n⚠️ 注：AI 分析可能因长度限制被截断，请检查配置"
+            
+            return result
         except Exception as e:
-            logger.error(f"主卡分析失败: {e}")
+            logger.error(f"主卡分析失败: {e}", exc_info=True)
             return f"❌ AI分析失败：{str(e)}"
 
     def analyze_detail(self, customer_data: Dict[str, Any], card_result: str) -> str:
@@ -223,15 +238,30 @@ class AIService:
         try:
             customer_info = self._format_customer_info(customer_data)
             prompt = PROMPT_DETAIL.replace("{customer_info}", customer_info).replace("{card_result}", card_result)
+            
+            # 调试：打印请求信息
+            logger.info(f"analyze_detail 请求: 模型={self.model}, prompt长度={len(prompt)}")
+            
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
-                max_tokens=1200
+                max_tokens=1500  # 增加到 1500 个 token
             )
-            return response.choices[0].message.content or "AI返回为空"
+            
+            result = response.choices[0].message.content or "AI返回为空"
+            
+            # 调试：打印响应信息
+            logger.info(f"analyze_detail 响应: 长度={len(result)}, 是否完成={not response.choices[0].finish_reason == 'length'}")
+            
+            # 检查是否因长度被截断
+            if response.choices[0].finish_reason == 'length':
+                logger.warning(f"AI 详情响应被长度截断，可能需要增加 max_tokens")
+                result += "\n\n⚠️ 注：AI 详情分析可能因长度限制被截断，请检查配置"
+            
+            return result
         except Exception as e:
-            logger.error(f"详情分析失败: {e}")
+            logger.error(f"详情分析失败: {e}", exc_info=True)
             return f"❌ AI分析失败：{str(e)}"
 
     def generate_weekly_report(self, weekly_stats: Dict[str, Any]) -> str:
