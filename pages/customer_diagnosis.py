@@ -401,6 +401,22 @@ def show_customer_diagnosis_page():
             from core.database import db
             from datetime import datetime
 
+            # 调试：打印数据库查询结果
+            st.markdown("### 🔍 调试信息")
+            with st.expander("查看数据库查询详情（调试用）"):
+                try:
+                    raw_customers = db.select("customers_v3", order_by="created_at.desc", limit=200)
+                    st.write(f"**原始查询结果数量：** {len(raw_customers)}")
+                    if raw_customers:
+                        st.write("**第一条记录数据：**")
+                        st.json(raw_customers[0])
+                    else:
+                        st.warning("数据库返回空列表")
+                except Exception as debug_e:
+                    st.error(f"数据库查询异常：{debug_e}")
+                    import traceback
+                    st.code(traceback.format_exc())
+
             customers = db.select("customers_v3", order_by="created_at.desc", limit=200)
 
             # 本地筛选
