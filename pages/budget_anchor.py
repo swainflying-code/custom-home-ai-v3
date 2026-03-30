@@ -277,7 +277,9 @@ def _fill_wd(code, tier, customer):
                              key=f"{code}_door")
     door_qty = st.number_input("门板扇数（玻璃/镜面/皮革时填）", min_value=0, value=2, key=f"{code}_dq")
 
-    pkg_labels = {k: f"{v['name']} — {v['desc']}{' (含基准价)' if v['price']==0 else f' (+¥{v[\"price\"]:,}/组)'}"
+    def _pkg_suffix(v):
+        return " (含基准价)" if v["price"] == 0 else f" (+¥{v['price']:,}/组)"
+    pkg_labels = {k: f"{v['name']} — {v['desc']}{_pkg_suffix(v)}"
                   for k, v in t["interiorPackages"].items()}
     pkg = st.selectbox("内部配置包", list(pkg_labels.keys()), format_func=lambda k: pkg_labels[k], key=f"{code}_pkg")
 
