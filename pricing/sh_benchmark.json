@@ -1,0 +1,19 @@
+{
+  "category": "SH",
+  "name": "书柜",
+  "unit": "投影面积",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "open_perSqm": 600,  "withDoor_perSqm": 800,  "mixed_perSqm": 750  },
+    "quality":  { "open_perSqm": 900,  "withDoor_perSqm": 1200, "mixed_perSqm": 1100 },
+    "flagship": { "open_perSqm": 1400, "withDoor_perSqm": 1800, "mixed_perSqm": 1600 }
+  },
+  "accessories": {
+    "glassDoor_perLeaf":        400,
+    "shelfLight_perLayer":      100,
+    "deskExtension_perMeter":   800
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

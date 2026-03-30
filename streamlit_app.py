@@ -205,8 +205,13 @@ def show_main():
             st.markdown("---")
 
             # 导航菜单
+            user_role = (st.session_state.get('user_info') or {}).get('role', 'user')
             pages = ["客户诊断", "方案引导", "预算锚定", "成交推进", "数据统计", "系统设置"]
             icons = ["clipboard2-pulse", "palette2", "cash-coin", "rocket-takeoff", "graph-up-arrow", "gear"]
+            # 管理员追加价格管理入口
+            if user_role == "admin":
+                pages.append("价格管理")
+                icons.append("currency-exchange")
             current_idx = pages.index(selected_page) if selected_page in pages else 0
 
             selected_page = option_menu(
@@ -287,6 +292,10 @@ def show_main():
 
         elif selected_page == "系统设置":
             _show_settings()
+
+        elif selected_page == "价格管理":
+            from pages.admin_pricing import show_admin_pricing_page
+            show_admin_pricing_page()
 
         else:
             st.warning(f"页面 '{selected_page}' 尚未实现")

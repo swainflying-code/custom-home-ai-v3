@@ -141,11 +141,33 @@ CREATE TRIGGER update_customers_v3_updated_at
     BEFORE UPDATE ON customers_v3
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- ── 报价记录表 V3（预算锚定 C 模块输出） ───────────────────────────
+CREATE TABLE IF NOT EXISTS quotes_v3 (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id     UUID REFERENCES customers_v3(id) ON DELETE SET NULL,
+    customer_name   VARCHAR(100),
+    budget_range    VARCHAR(30),
+    tier            VARCHAR(20),        -- 经济款/品质款/旗舰款
+    total_amount    NUMERIC(12, 2),     -- 报价总额
+    quote_detail    TEXT,               -- JSON：各品类计算明细
+    report_text     TEXT,               -- 报价单文字版
+    created_by      UUID REFERENCES users(id),
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_quotes_v3_customer ON quotes_v3(customer_id);
+CREATE INDEX IF NOT EXISTS idx_quotes_v3_created  ON quotes_v3(created_at DESC);
+
+ALTER TABLE quotes_v3 ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "v3_allow_authenticated" ON quotes_v3
+    FOR ALL USING (true) WITH CHECK (true);
+
 -- ── 完成 ──────────────────────────────────────────────────────────────
 -- 执行完毕提示：
 -- ✅ customers_v3    - 客户诊断主表（V3 四板块，33字段）
 -- ✅ follow_up_records_v3 - 跟进记录
 -- ✅ weekly_reports_v3    - 老板周报存档
+-- ✅ quotes_v3            - 预算锚定报价记录（C 模块）
 -- ⚠️  users 表：V2已有则复用；全新项目取消上方注释执行
 --
 -- Streamlit Cloud Secrets 配置：

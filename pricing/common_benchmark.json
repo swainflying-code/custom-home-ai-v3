@@ -1,0 +1,31 @@
+{
+  "install": {
+    "urban_transport_min": 300,
+    "urban_transport_max": 500,
+    "install_perMeter_linear":  150,
+    "install_perSqm_area":      100,
+    "install_perUnit":          200,
+    "highFloor_noElevator_min": 200,
+    "highFloor_noElevator_max": 500,
+    "remote_area_min":          500,
+    "remote_area_max":          1500,
+    "demolition_min":           500,
+    "demolition_max":           2000
+  },
+  "universal_processes": {
+    "antiFingerprint_perMeter":   150,
+    "recessedLight_perMeter":     150,
+    "irregularCutting_min":       500,
+    "irregularCutting_max":       1500,
+    "glassDoor_min":              300,
+    "glassDoor_max":              500,
+    "leatherDoor_perLeaf":        600,
+    "rockSlabCountertop_perMeter":500,
+    "sidePanel_perPiece":         150,
+    "topPanel_min":               200,
+    "topPanel_max":               500
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

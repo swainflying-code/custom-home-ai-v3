@@ -1,0 +1,23 @@
+{
+  "category": "JIU",
+  "name": "酒柜",
+  "unit": "投影面积",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "display_perSqm": 900,  "tempControl_perSqm": 2000 },
+    "quality":  { "display_perSqm": 1400, "tempControl_perSqm": 3000 },
+    "flagship": { "display_perSqm": 2000, "tempControl_perSqm": 4500 }
+  },
+  "accessories": {
+    "tempControlUnit_single_min":  3000,
+    "tempControlUnit_single_max":  5000,
+    "tempControlUnit_dual_min":    5000,
+    "tempControlUnit_dual_max":    8000,
+    "ledColorLight_perLayer":      200,
+    "rotatingDisplay":             600,
+    "cigarHumidor":                1500
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

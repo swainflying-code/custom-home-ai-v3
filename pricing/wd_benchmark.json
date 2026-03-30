@@ -1,0 +1,44 @@
+{
+  "category": "WD",
+  "name": "衣柜",
+  "unit": "投影面积",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "flatDoor_perSqm": 800,  "slidingDoor_perSqm": 900  },
+    "quality":  { "flatDoor_perSqm": 1200, "slidingDoor_perSqm": 1400 },
+    "flagship": { "flatDoor_perSqm": 1800, "slidingDoor_perSqm": 2000 }
+  },
+  "interiorPackages": {
+    "basic":    { "name": "基础包",  "price": 0,    "desc": "层板×4 + 衣通×2" },
+    "standard": { "name": "标准包",  "price": 800,  "desc": "层板×4 + 衣通×2 + 抽屉×2 + 裤架×1" },
+    "premium":  { "name": "品质包",  "price": 2000, "desc": "标准包 + 旋转衣架 + 首饰抽 + 全拉出裤架" },
+    "flagship": { "name": "旗舰包",  "price": 4000, "desc": "品质包 + 智能感应灯 + 升降衣通 + 鞋架模块" }
+  },
+  "doorUpgrades": {
+    "flatDoor":     { "name": "平开门（标配）",  "add_perSqm": 0,   "add_perDoor": 0   },
+    "slidingDoor":  { "name": "推拉门",          "add_perSqm": 150, "add_perDoor": 0   },
+    "glassDoor":    { "name": "玻璃门（铝框）",  "add_perSqm": 0,   "add_perDoor": 400 },
+    "mirrorDoor":   { "name": "镜面门",          "add_perSqm": 0,   "add_perDoor": 300 },
+    "leatherDoor":  { "name": "皮革门板",        "add_perSqm": 0,   "add_perDoor": 600 }
+  },
+  "hardware": {
+    "hinge_perUnit":         { "economy": 15,  "quality": 45,   "flagship": 80   },
+    "drawerRail_perSet":     { "economy": 80,  "quality": 200,  "flagship": 350  },
+    "rotatingRack":          { "economy": 500, "quality": 800,  "flagship": 1200 },
+    "liftingRod":            { "economy": 600, "quality": 1000, "flagship": 1500 },
+    "pantRack_pullOut":      { "economy": 200, "quality": 400,  "flagship": 600  },
+    "sensorLight_perGroup":  { "economy": 0,   "quality": 200,  "flagship": 350  }
+  },
+  "processes": {
+    "topPanel_min":          200,
+    "topPanel_max":          500,
+    "sidePanel_perPiece":    150,
+    "cornerConnector":       300,
+    "recessedLight_perMeter":150,
+    "handleUpgrade_min":     100,
+    "handleUpgrade_max":     300
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

@@ -1,0 +1,58 @@
+{
+  "category": "KC",
+  "name": "橱柜",
+  "unit": "延米",
+  "hasCountertop": true,
+  "tiers": {
+    "economy": { "baseCabinet_perMeter": 1500, "wallCabinet_perMeter": 600, "combo_perMeter": 2000 },
+    "quality":  { "baseCabinet_perMeter": 2200, "wallCabinet_perMeter": 900, "combo_perMeter": 2900 },
+    "flagship": { "baseCabinet_perMeter": 3200, "wallCabinet_perMeter": 1400, "combo_perMeter": 4300 }
+  },
+  "countertop": {
+    "304_brushed":          { "economy": 1500, "quality": 2200, "flagship": 3000 },
+    "304_antiFingerprint":  { "economy": 1800, "quality": 2600, "flagship": 3500 },
+    "quartz":               { "economy": 1200, "quality": 1800, "flagship": 2800 },
+    "mixed_steel_quartz":   { "economy": 2000, "quality": 2800, "flagship": 3800 }
+  },
+  "countertopCoefficients": {
+    "standardDepth_600": 1.0,
+    "deep_650plus": 1.15,
+    "waterfall_edge": 1.3,
+    "integratedSplashback_perMeter": 200,
+    "irregularCutting_min": 500,
+    "irregularCutting_max": 1500
+  },
+  "modules": [
+    { "code": "B-60", "name": "地柜（单门）",   "width_mm": 600, "economy": 1200, "quality": 1800, "flagship": 2600 },
+    { "code": "B-80", "name": "地柜（双门）",   "width_mm": 800, "economy": 1500, "quality": 2200, "flagship": 3200 },
+    { "code": "B-90", "name": "水槽柜",         "width_mm": 900, "economy": 1800, "quality": 2600, "flagship": 3800 },
+    { "code": "B-SC", "name": "灶台柜",         "width_mm": 0,   "economy": 1600, "quality": 2400, "flagship": 3500, "note": "按灶具定制" },
+    { "code": "B-CR", "name": "转角柜",         "width_mm": 900, "economy": 2200, "quality": 3200, "flagship": 4600 },
+    { "code": "B-DR", "name": "抽屉柜（3抽）",  "width_mm": 600, "economy": 2000, "quality": 3000, "flagship": 4200 },
+    { "code": "W-60", "name": "吊柜（单门）",   "width_mm": 600, "economy": 800,  "quality": 1200, "flagship": 1800 },
+    { "code": "W-80", "name": "吊柜（双门）",   "width_mm": 800, "economy": 1000, "quality": 1500, "flagship": 2200 },
+    { "code": "W-RG", "name": "搁板架",         "width_mm": 600, "economy": 400,  "quality": 600,  "flagship": 900  },
+    { "code": "T-XX", "name": "高柜/电器柜",    "width_mm": 0,   "economy": 3000, "quality": 4500, "flagship": 6500, "note": "按需定制" }
+  ],
+  "hardware": {
+    "hinge_perUnit":              { "economy": 15,  "quality": 45,   "flagship": 80  },
+    "drawerRail_perSet":          { "economy": 80,  "quality": 200,  "flagship": 350 },
+    "liftUpGasStrut_perSet":      { "economy": 60,  "quality": 150,  "flagship": 280 },
+    "pullOutBasket_standard":     { "economy": 300, "quality": 600,  "flagship": 1200 },
+    "cornerCarousel":             { "economy": 800, "quality": 1500, "flagship": 2500 },
+    "spiceRack":                  { "economy": 250, "quality": 500,  "flagship": 800  }
+  },
+  "processes": {
+    "antiFingerprint_perMeter":   150,
+    "moistureProof_perMeter":     80,
+    "waterfallEdge_perMeter":     300,
+    "irregularCutting_min":       500,
+    "irregularCutting_max":       1500,
+    "recessedLight_perGroup":     200,
+    "customPipeCover_min":        800,
+    "customPipeCover_max":        1500
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

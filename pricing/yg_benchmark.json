@@ -1,0 +1,23 @@
+{
+  "category": "YG",
+  "name": "阳台柜",
+  "unit": "延米",
+  "hasCountertop": true,
+  "tiers": {
+    "economy":  { "cabinetOnly_perMeter": 1200, "withCountertop_perMeter": 1800, "withCountertopSink_perMeter": 2200 },
+    "quality":  { "cabinetOnly_perMeter": 1800, "withCountertop_perMeter": 2500, "withCountertopSink_perMeter": 3000 },
+    "flagship": { "cabinetOnly_perMeter": 2600, "withCountertop_perMeter": 3500, "withCountertopSink_perMeter": 4200 }
+  },
+  "accessories": {
+    "washingMachineSlot_perUnit": 500,
+    "sinkEmbedded_min":           800,
+    "sinkEmbedded_max":           1500,
+    "mopPoolReserve":             300,
+    "waterHeaterCover_min":       600,
+    "waterHeaterCover_max":       1000,
+    "detergentBasket":            400
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

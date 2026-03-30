@@ -673,14 +673,14 @@ def show_solution_guide_page():
         </div>
         """, unsafe_allow_html=True)
 
-        # 渲染分析内容
-        st.markdown(f"""
-        <div style="background:#f6fbff; border:1px solid #bae0ff; border-radius:8px;
-                    padding:18px 20px; white-space:pre-wrap; font-size:14px; line-height:2;
-                    font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
-{analysis_result}
-        </div>
-        """, unsafe_allow_html=True)
+        # 渲染分析内容（用原生 markdown 渲染，避免 HTML div 与 markdown 双重渲染导致内容重复）
+        with st.container():
+            st.markdown(
+                '<div style="background:#f6fbff; border:1px solid #bae0ff; border-radius:8px; padding:18px 20px;">',
+                unsafe_allow_html=True
+            )
+            st.markdown(analysis_result)
+            st.markdown("</div>", unsafe_allow_html=True)
 
         # ── 一键复制（clipboard API，无需第二个展示窗口） ────────────
         import streamlit.components.v1 as components

@@ -1,0 +1,14 @@
+{
+  "category": "SN",
+  "name": "收纳柜",
+  "unit": "投影面积",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "standard400_perSqm": 700,  "deep500_perSqm": 850  },
+    "quality":  { "standard400_perSqm": 1000, "deep500_perSqm": 1200 },
+    "flagship": { "standard400_perSqm": 1500, "deep500_perSqm": 1800 }
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

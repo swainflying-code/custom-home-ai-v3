@@ -1,0 +1,20 @@
+{
+  "category": "TG",
+  "name": "厅柜/电视柜",
+  "unit": "延米",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "floating_perMeter": 1200, "floor_perMeter": 1000 },
+    "quality":  { "floating_perMeter": 1800, "floor_perMeter": 1500 },
+    "flagship": { "floating_perMeter": 2600, "floor_perMeter": 2200 }
+  },
+  "accessories": {
+    "recessedLight_perMeter":  150,
+    "cableManagement":         100,
+    "openShelf_deduct_perSlot":-200,
+    "rockOrSteelTop_perMeter": 400
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

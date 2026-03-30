@@ -1,0 +1,25 @@
+{
+  "category": "XG",
+  "name": "鞋柜",
+  "unit": "单组",
+  "hasCountertop": false,
+  "tiers": {
+    "economy":  { "standard_perUnit": 1500, "withBench_perUnit": 2200 },
+    "quality":  { "standard_perUnit": 2200, "withBench_perUnit": 3200 },
+    "flagship": { "standard_perUnit": 3200, "withBench_perUnit": 4500 }
+  },
+  "notes": {
+    "standardSize": "宽800×深350×高2400mm"
+  },
+  "accessories": {
+    "rotatingRack_min":  800,
+    "rotatingRack_max":  1500,
+    "hookMirror":        300,
+    "sensorLight":       200,
+    "benchSoftPad":      200,
+    "ventedDoor_perLeaf":150
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}

@@ -1,0 +1,21 @@
+{
+  "category": "CB",
+  "name": "餐边柜",
+  "unit": "延米",
+  "hasCountertop": true,
+  "tiers": {
+    "economy":  { "storage_perMeter": 1500, "withCountertop_perMeter": 2000, "withCountertopAppliance_perMeter": 2600 },
+    "quality":  { "storage_perMeter": 2200, "withCountertop_perMeter": 2800, "withCountertopAppliance_perMeter": 3600 },
+    "flagship": { "storage_perMeter": 3200, "withCountertop_perMeter": 4000, "withCountertopAppliance_perMeter": 5200 }
+  },
+  "accessories": {
+    "trackOutlet":             200,
+    "waterPurifierSlot":       500,
+    "ovenSteamerSlot":         600,
+    "glassDoor_perLeaf":       300,
+    "rockSlabCountertop_perMeter": 500
+  },
+  "lastUpdated": "2026-03-30",
+  "updatedBy": "admin",
+  "version": 1
+}
