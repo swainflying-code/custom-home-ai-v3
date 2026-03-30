@@ -399,7 +399,7 @@ def show_customer_diagnosis_page():
         # 加载数据
         try:
             from core.database import db
-            from datetime import datetime, timedelta
+            from datetime import datetime
 
             customers = db.select("customers_v3", order_by="created_at.desc", limit=200)
 
