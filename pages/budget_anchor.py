@@ -579,6 +579,13 @@ def _tab_export():
         st.info("请先完成报价计算，再导出报价单")
         return
 
+    # 调试：显示当前选中的品类和报价数据
+    with st.expander("🔍 调试：当前数据状态", expanded=False):
+        st.write("**选中的品类（selected_categories）：**", sel)
+        st.write("**已计算的报价（quotes keys）：**", list(quotes.keys()))
+        for code, tier_dict in quotes.items():
+            st.write(f"- {code}：{list(tier_dict.keys())}")
+
     name   = customer.get("customer_name", "未知客户")
     budget = customer.get("budget_range", "未透露")
     tier   = st.selectbox("导出档位", TIER_LABELS, index=1, key="export_tier")
@@ -589,7 +596,14 @@ def _tab_export():
     lines.append(f"日期：2026-03-30\n")
 
     total_sum = 0
-    for code in sel:
+    # 修复：遍历 quotes 的 keys（已计算的品类），而不是 sel（选中的品类）
+    # 这样可以确保只导出真正有报价数据的品类
+    export_codes = list(quotes.keys())
+    st.write(f"**将导出的品类：**", export_codes)
+
+    for code in export_codes:
+        if code not in CATEGORY_META:
+            continue
         meta = CATEGORY_META[code]
         result = (quotes.get(code) or {}).get(tier)
         if result:

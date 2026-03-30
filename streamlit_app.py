@@ -164,7 +164,7 @@ def show_login():
 
                     # 默认账户兜底
                     if not authed:
-                        default_accounts = {"admin": "admin123", "user": "user123"}
+                        default_accounts = {"admin": "admin200221", "user": "user123"}
                         if default_accounts.get(username) == password:
                             st.session_state.logged_in = True
                             st.session_state.user_info = {
@@ -182,7 +182,7 @@ def show_login():
 
         st.markdown("""
         <div style="text-align:center; color:rgba(255,255,255,0.25); font-size:11px; margin-top:24px;">
-            默认账号：admin / admin123
+            如无账号，请联系管理员开通
         </div>
         """, unsafe_allow_html=True)
 
@@ -206,7 +206,7 @@ def show_main():
 
             # 导航菜单
             user_role = (st.session_state.get('user_info') or {}).get('role', 'user')
-            pages = ["客户诊断", "方案引导", "预算锚定", "成交推进", "数据统计", "系统设置"]
+            pages = ["客户洞察", "设计概念", "预算锚定", "成交推进", "数据统计", "系统设置"]
             icons = ["clipboard2-pulse", "palette2", "cash-coin", "rocket-takeoff", "graph-up-arrow", "gear"]
             # 管理员追加价格管理入口
             if user_role == "admin":
@@ -270,11 +270,11 @@ def show_main():
 
     # 路由到各引擎
     try:
-        if selected_page == "客户诊断":
+        if selected_page == "客户洞察":
             from pages.customer_diagnosis import show_customer_diagnosis_page
             show_customer_diagnosis_page()
 
-        elif selected_page == "方案引导":
+        elif selected_page == "设计概念":
             from pages.solution_guide import show_solution_guide_page
             show_solution_guide_page()
 
@@ -308,12 +308,67 @@ def show_main():
 
 def _show_settings():
     st.markdown("### ⚙️ 系统设置")
-    st.info("系统设置功能开发中")
+
+    user_role = (st.session_state.get('user_info') or {}).get('role', 'user')
+
+    # 用户管理（仅管理员）
+    if user_role == "admin":
+        st.markdown("---")
+        st.markdown("### 👥 用户管理")
+
+        # 新增用户表单
+        with st.expander("➕ 新增用户", expanded=False):
+            new_username = st.text_input("用户名", key="new_username")
+            new_password = st.text_input("密码", type="password", key="new_password")
+            new_display = st.text_input("显示名称", key="new_display")
+            new_role = st.selectbox("角色", ["admin", "user"], key="new_role")
+
+            if st.button("创建用户", key="btn_create_user"):
+                if not new_username.strip() or not new_password.strip():
+                    st.error("用户名和密码不能为空")
+                else:
+                    try:
+                        from core.database import db
+                        from core.auth import AuthManager
+                        auth = AuthManager()
+                        pwd_hash = auth.hash_password(new_password)
+
+                        # 检查用户名是否已存在
+                        existing = db.client.table("users").select("*").eq("username", new_username).execute()
+                        if existing.data:
+                            st.error(f"用户名 '{new_username}' 已存在")
+                        else:
+                            db.client.table("users").insert({
+                                "username": new_username,
+                                "password_hash": pwd_hash,
+                                "display_name": new_display or new_username,
+                                "role": new_role,
+                            }).execute()
+                            st.success(f"✅ 用户 '{new_username}' 创建成功")
+                    except Exception as e:
+                        st.error(f"创建失败：{e}")
+
+        # 用户列表
+        st.markdown("#### 已有用户列表")
+        try:
+            from core.database import db
+            users = db.client.table("users").select("*").order("created_at", desc=True).execute().data
+            if users:
+                import pandas as pd
+                df = pd.DataFrame(users)
+                display_cols = ["username", "display_name", "role", "created_at"]
+                st.dataframe(df[display_cols], use_container_width=True, hide_index=True)
+            else:
+                st.info("暂无用户")
+        except Exception as e:
+            st.warning(f"加载用户列表失败：{e}")
+
+    st.markdown("---")
     st.markdown("""
     **版本信息**
     - 应用：成交魔方 V3.0
     - 广告语：让每一个客户，都走到成交
-    - 四大引擎：客户诊断 / 方案引导 / 预算锚定 / 成交推进
+    - 四大引擎：客户洞察 / 设计概念 / 预算锚定 / 成交推进
     """)
 
 
