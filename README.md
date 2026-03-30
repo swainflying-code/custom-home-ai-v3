@@ -27,10 +27,6 @@ MIMO_MODEL = "mimo-v2-pro"
 SECRET_KEY = "any-random-string"
 ```
 
-### 3. 默认账号
-- admin / admin123
-- user / user123
-
 ## 📁 项目结构
 ```
 custom-home-ai-v3/
