@@ -24,6 +24,19 @@ CREATE TABLE IF NOT EXISTS users (
 );
 */
 
+-- 兼容 V2 的 users 表：确保 display_name 字段存在
+ALTER TABLE users ADD COLUMN IF NOT EXISTS display_name VARCHAR(100);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+-- 创建用户表索引
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "users_allow_authenticated" ON users;
+CREATE POLICY "users_allow_authenticated" ON users
+    FOR ALL TO anon, authenticated USING (true) WITH CHECK (true);
+
 -- ── 客户表 V3（核心表）──────────────────────────────────────────────
 -- 与 V2 的 customers 表完全独立，字段结构全新
 CREATE TABLE IF NOT EXISTS customers_v3 (
@@ -121,10 +134,13 @@ ALTER TABLE follow_up_records_v3 ENABLE ROW LEVEL SECURITY;
 ALTER TABLE weekly_reports_v3   ENABLE ROW LEVEL SECURITY;
 
 -- 允许所有已认证用户读写（简单策略）
+DROP POLICY IF EXISTS "v3_allow_authenticated" ON customers_v3;
 CREATE POLICY "v3_allow_authenticated" ON customers_v3
     FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "v3_allow_authenticated" ON follow_up_records_v3;
 CREATE POLICY "v3_allow_authenticated" ON follow_up_records_v3
     FOR ALL USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "v3_allow_authenticated" ON weekly_reports_v3;
 CREATE POLICY "v3_allow_authenticated" ON weekly_reports_v3
     FOR ALL USING (true) WITH CHECK (true);
 
@@ -159,6 +175,7 @@ CREATE INDEX IF NOT EXISTS idx_quotes_v3_customer ON quotes_v3(customer_id);
 CREATE INDEX IF NOT EXISTS idx_quotes_v3_created  ON quotes_v3(created_at DESC);
 
 ALTER TABLE quotes_v3 ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "v3_allow_authenticated" ON quotes_v3;
 CREATE POLICY "v3_allow_authenticated" ON quotes_v3
     FOR ALL USING (true) WITH CHECK (true);
 
