@@ -453,7 +453,7 @@ def show_customer_diagnosis_page():
                     spaces_raw = c.get("custom_spaces") or []
                     spaces = " / ".join(spaces_raw) if spaces_raw else "-"
 
-                        table_data.append({
+                    table_data.append({
                         "客户姓名": name,
                         "意向": badge,
                         "客户编号": no,

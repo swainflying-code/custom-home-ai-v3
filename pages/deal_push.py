@@ -234,30 +234,72 @@ def show_deal_push_page():
                     with st.spinner("🤖 AI分析中（约需10-20秒）..."):
                         try:
                             from core.ai_service import get_ai_service
+                            from core.database import db
+                            
                             # 获取客户数据
                             customer = st.session_state.deal_push_selected_customer
-                            # 构建分析请求
+                            
+                            # 获取当前页面的deal_push数据
+                            deal_push_data = {
+                                "quote_version": st.session_state.get("deal_quote_version", ""),
+                                "recent_quote": st.session_state.get("deal_recent_quote", ""),
+                                "quote_status": st.session_state.get("deal_quote_status", ""),
+                                "quote_timeline": st.session_state.get("deal_quote_timeline", ""),
+                                "bargain_info": st.session_state.get("deal_bargain_info", ""),
+                                "competitor_mentioned": st.session_state.get("deal_competitor_mentioned", ""),
+                                "competitor_name": st.session_state.get("deal_competitor_name", ""),
+                                "compare_dimension": st.session_state.get("deal_compare_dimension", ""),
+                                "advantage_recognition": st.session_state.get("deal_advantage_recognition", ""),
+                                "key_to_deal": st.session_state.get("deal_key_to_deal", ""),
+                                "sales_report": sales_report
+                            }
+                            
+                            # 调用AI分析
                             ai = get_ai_service()
+                            analysis_result = ai.analyze_deal_push(customer, deal_push_data, sales_report)
                             
-                            # 生成 AI 分析（这里可以创建专门的 AI 分析方法）
-                            # 临时使用一个简化的分析
-                            st.session_state.deal_push_ai_analysis = """**🎯 一句话判断**
-这个客户还在犹豫，拿竞品压价是习惯动作，但回复变慢说明耐心有限。
-
-**🗣️ 下一次话术（能直接用）**
-王哥，跟您说实话，欧派的台面标准是颗粒板覆膜，我们标配就是304不锈钢。这周末仓库有个客户退单，这套现货能比报价少3000，但只留到周四。您明天方便带嫂子来看实物吗？
-
-**⚔️ 异议拆弹**
-异议: "太贵了，欧派便宜很多"
-拆解: 他在拿你报价对比板材品牌的标价，没算五金、台面、安装费的差异
-打法: 别比总价，比"到手价"——"哥，您把欧派报价的五金、台面、安装费都加上，咱们比的是同一个东西，我这边算完其实差不多，但我台面是304不锈钢的。"
-
-**📅 跟进节奏建议**
-- 今天: 发上面的话术微信，附一张不锈钢台面实物图
-- 3天内: 如果没回复，打电话只说"您上次看的台面，我找到一个更好的实拍"
-- 7天兜底: 发门店周末活动通知，给一个"老客户专享"名额"""
-                            
+                            # 保存到session state
+                            st.session_state.deal_push_ai_analysis = analysis_result
                             st.session_state.deal_push_sales_report = sales_report
+                            
+                            # 尝试保存到数据库（deal_push_v3表）
+                            try:
+                                if customer.get("id"):
+                                    # 检查是否已有记录
+                                    existing = db.select(
+                                        "deal_push_v3",
+                                        filters={"customer_id": customer["id"]},
+                                        limit=1
+                                    )
+                                    
+                                    deal_push_record = {
+                                        "customer_id": customer["id"],
+                                        "customer_no": customer.get("customer_no"),
+                                        "customer_name": customer.get("customer_name"),
+                                        "quote_version": deal_push_data["quote_version"],
+                                        "recent_quote": deal_push_data["recent_quote"],
+                                        "quote_status": deal_push_data["quote_status"],
+                                        "quote_timeline": deal_push_data["quote_timeline"],
+                                        "bargain_info": deal_push_data["bargain_info"],
+                                        "competitor_mentioned": deal_push_data["competitor_mentioned"],
+                                        "competitor_name": deal_push_data["competitor_name"],
+                                        "compare_dimension": deal_push_data["compare_dimension"],
+                                        "advantage_recognition": deal_push_data["advantage_recognition"],
+                                        "key_to_deal": deal_push_data["key_to_deal"],
+                                        "sales_report": sales_report,
+                                        "ai_analysis": analysis_result,
+                                        "updated_at": "now()"
+                                    }
+                                    
+                                    if existing:
+                                        # 更新记录
+                                        db.update("deal_push_v3", deal_push_record, filters={"id": existing[0]["id"]})
+                                    else:
+                                        # 插入新记录
+                                        db.insert("deal_push_v3", deal_push_record)
+                            except Exception as db_error:
+                                logger.warning(f"保存deal_push数据失败（不影响AI分析）: {db_error}")
+                            
                             st.success("✅ AI分析生成完成！")
                             st.rerun()
                             
