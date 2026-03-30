@@ -67,7 +67,8 @@ CREATE TABLE IF NOT EXISTS customers_v3 (
 
     -- C. 需求与偏好标签
     style_preference    TEXT[],                -- 最多2个：现代简约/轻奢/新中式/原木自然/极简灰系/其他
-    material_preference TEXT[],                -- 最多2个：不锈钢/烤漆/木纹/玻璃/岩板等
+    appearance_preference TEXT[],              -- 最多3个：烤漆/实木/转印纹理/玻璃/岩板/石材/暂未明确
+    material_type_preference TEXT[],           -- 最多2个：不锈钢/实木/颗粒板/多层板/欧松板/暂未明确
     focus_points        TEXT[],                -- 最多3个：颜值设计/收纳实用/环保健康等
     compare_brands      VARCHAR(200),          -- 对比品牌（是/否+填写）
     family_size         VARCHAR(20),           -- 1-2人/3-4人/5人以上
@@ -179,9 +180,56 @@ DROP POLICY IF EXISTS "v3_allow_authenticated" ON quotes_v3;
 CREATE POLICY "v3_allow_authenticated" ON quotes_v3
     FOR ALL USING (true) WITH CHECK (true);
 
+-- ── 成交推进表 V3（全新D板块） ───────────────────────────
+CREATE TABLE IF NOT EXISTS deal_push_v3 (
+    id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    customer_id     UUID REFERENCES customers_v3(id) ON DELETE CASCADE,
+    
+    -- D1. 成交判断与状态
+    quote_version       VARCHAR(20),        -- L1 估算 / L2 方案报价 / L3 精准报价 / 未报价
+    recent_quote_amount NUMERIC(12, 2),     -- 最近报价金额
+    quote_sent_status   VARCHAR(30),        -- 未发送 / 仅口头 / 已发送（日期）
+    quote_sent_date     DATE,
+    customer_bargain    VARCHAR(30),        -- 未还价 / 还价 / 要求折扣 / 要求赠送
+    bargain_amount      NUMERIC(12, 2),
+    
+    -- D3. 跟进时间线
+    last_contact_date   DATE,
+    last_contact_method VARCHAR(20),        -- 到店 / 电话 / 微信 / 短信 / 未联系
+    customer_response   VARCHAR(20),        -- 已回复 / 未回复 / 拒接 / 未联系
+    next_contact_date   DATE,
+    block_reason        VARCHAR(50),        -- 跟进阻塞原因
+    other_block_reason  VARCHAR(200),
+    
+    -- D4. 竞品与博弈信息
+    competitor_mentioned VARCHAR(10),       -- 未提及 / 提及
+    competitor_name     VARCHAR(100),       -- 竞品品牌名
+    compare_dimension   VARCHAR(20),        -- 价格 / 品质 / 设计 / 品牌 / 工期 / 未明确
+    advantage_recognition VARCHAR(20),      -- 未提及 / 认可 / 不认可
+    key_to_deal         VARCHAR(200),       -- 离成交的关键一步
+    
+    -- D5. AI分析
+    sales_report        TEXT,               -- 销售战况汇报
+    ai_analysis         TEXT,               -- AI分析结果
+    
+    -- 元数据
+    created_by      UUID REFERENCES users(id),
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_deal_push_v3_customer ON deal_push_v3(customer_id);
+CREATE INDEX IF NOT EXISTS idx_deal_push_v3_contact_date ON deal_push_v3(next_contact_date);
+
+ALTER TABLE deal_push_v3 ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "v3_allow_authenticated" ON deal_push_v3;
+CREATE POLICY "v3_allow_authenticated" ON deal_push_v3
+    FOR ALL USING (true) WITH CHECK (true);
+
 -- ── 完成 ──────────────────────────────────────────────────────────────
 -- 执行完毕提示：
--- ✅ customers_v3    - 客户诊断主表（V3 四板块，33字段）
+-- ✅ customers_v3    - 客户洞察主表（V3 A~C板块）
+-- ✅ deal_push_v3    - 成交推进表（V3 D板块）
 -- ✅ follow_up_records_v3 - 跟进记录
 -- ✅ weekly_reports_v3    - 老板周报存档
 -- ✅ quotes_v3            - 预算锚定报价记录（C 模块）

@@ -135,19 +135,24 @@ def show_customer_diagnosis_page():
                     ["现代简约", "轻奢", "新中式", "原木自然", "极简灰系", "其他"],
                     max_selections=2
                 )
-                material_preference = st.multiselect(
-                    "2. 材质倾向（最多选2）",
-                    ["不锈钢", "烤漆", "木纹", "玻璃", "岩板", "石材感", "颗粒板", "多层板", "欧松板", "暂未明确"],
+                appearance_preference = st.multiselect(
+                    "2. 外观质感倾向（最多选3）",
+                    ["烤漆", "实木", "转印纹理", "玻璃", "岩板", "石材", "暂未明确"],
+                    max_selections=3
+                )
+                material_type_preference = st.multiselect(
+                    "3. 板材材质倾向（最多选2）",
+                    ["不锈钢", "实木", "颗粒板", "多层板", "欧松板", "暂未明确"],
                     max_selections=2
                 )
                 focus_points = st.multiselect(
-                    "3. 最关注点（最多选3）",
+                    "4. 最关注点（最多选3）",
                     ["颜值设计", "收纳实用", "环保健康", "耐用性", "性价比", "易清洁打理", "智能功能", "品牌/售后"],
                     max_selections=3
                 )
             with col6:
                 compare_brands_yn = st.radio(
-                    "4. 是否对比其他品牌",
+                    "5. 是否对比其他品牌",
                     ["否", "是"],
                     horizontal=True
                 )
@@ -155,43 +160,12 @@ def show_customer_diagnosis_page():
                 if compare_brands_yn == "是":
                     compare_brands = st.text_input("对比品牌名称", placeholder="如：欧派、索菲亚")
                 family_size = st.selectbox(
-                    "5. 家庭人数",
+                    "6. 家庭人数",
                     ["未知", "1-2人", "3-4人", "5人以上"]
                 )
 
             st.markdown("---")
-            # ── D. 成交判断与状态 ─────────────────────────────────
-            st.markdown("### 🅳 成交判断与状态")
-            col7, col8 = st.columns(2)
-            with col7:
-                quote_status = st.selectbox(
-                    "1. 是否提及报价",
-                    ["未报价", "口头报价", "初步报价", "详细报价"]
-                )
-                price_reaction = st.selectbox(
-                    "2. 客户对价格反应",
-                    ["未报价", "接受", "偏高但有意向", "明确拒绝", "未表态"]
-                )
-                intent_level = st.selectbox(
-                    "3. 当前意向等级",
-                    ["低意向（3个月以上）", "中意向（3个月内）", "高意向（1个月内）"]
-                )
-                core_objections = st.multiselect(
-                    "4. 核心异议（最多选2）",
-                    ["价格", "风格", "材质", "环保", "品牌信任", "工期", "家人未统一",
-                     "还要对比", "方案不清晰", "暂无明确需求"],
-                    max_selections=2
-                )
-            with col8:
-                departure_status = st.selectbox(
-                    "5. 离店状态",
-                    ["正向（积极）", "正向（平静）", "负向（犹豫）", "负向（抗拒）", "负向（不满）"]
-                )
-                departure_note = st.text_input("离店状态备注（可选）", placeholder="补充说明")
-                sales_note = st.text_area("6. 销售备注", placeholder="补充重要信息...", height=80)
-                special_needs = st.text_area("7. 特殊需求补充", placeholder="其他需要记录的信息...", height=60)
-
-            st.markdown("---")
+            # ── 提交按钮 ─────────────────────────────────────────
             # ── 提交按钮 ─────────────────────────────────────────
             col_s1, col_s2, col_s3 = st.columns([1, 2, 1])
             with col_s2:
@@ -233,18 +207,11 @@ def show_customer_diagnosis_page():
                     "next_step": next_step,
                     "next_followup_date": next_followup_date.isoformat(),
                     "style_preference": style_preference,
-                    "material_preference": material_preference,
+                    "appearance_preference": appearance_preference,
+                    "material_type_preference": material_type_preference,
                     "focus_points": focus_points,
                     "compare_brands": compare_brands if compare_brands_yn == "是" else "否",
                     "family_size": family_size,
-                    "quote_status": quote_status,
-                    "price_reaction": price_reaction,
-                    "intent_level": intent_level,
-                    "core_objections": core_objections,
-                    "departure_status": departure_status,
-                    "departure_note": departure_note.strip(),
-                    "sales_note": sales_note.strip(),
-                    "special_needs": special_needs.strip(),
                 }
 
                 # 保存到数据库
@@ -331,19 +298,21 @@ def show_customer_diagnosis_page():
         st.markdown("### 🔍 详情分析（五大板块）")
         detail_result = st.session_state.get("diag_detail_result", "")
         if detail_result:
+            # 只显示一个卡片，不重复渲染
             st.markdown(f"""
             <div style="background:#f0f8ff; border:1px solid #b0d4f1; border-radius:8px; padding:16px; white-space:pre-wrap; font-size:14px; line-height:1.9;">
 {detail_result}
             </div>
             """, unsafe_allow_html=True)
-            col_copy2, col_regen2 = st.columns([1, 1])
-            with col_copy2:
+            
+            # 一键复制按钮（在卡片下方）
+            if st.button("📋 一键复制详情分析", key="copy_detail"):
                 st.code(detail_result, language=None)
-            with col_regen2:
-                if st.button("🔄 重新生成详情分析", key="regen_detail"):
-                    st.session_state.diag_detail_result = ""
-                    st.rerun()
-            st.caption("💡 点击上方代码框右上角的复制图标，即可一键复制全文")
+                st.success("✅ 详情分析内容已复制到剪贴板！")
+            
+            if st.button("🔄 重新生成详情分析", key="regen_detail"):
+                st.session_state.diag_detail_result = ""
+                st.rerun()
         else:
             if card_result:
                 if st.button("▶ 展开详情分析", type="secondary"):
@@ -484,7 +453,7 @@ def show_customer_diagnosis_page():
                     spaces_raw = c.get("custom_spaces") or []
                     spaces = " / ".join(spaces_raw) if spaces_raw else "-"
 
-                    table_data.append({
+                        table_data.append({
                         "客户姓名": name,
                         "意向": badge,
                         "客户编号": no,
@@ -494,7 +463,7 @@ def show_customer_diagnosis_page():
                         "联系方式": c.get("contact", "-"),
                         "创建时间": created,
                         "AI分析": ai_done,
-                        "操作": idx,
+                        "操作": f"查看_{idx}",
                     })
 
                 df = pd.DataFrame(table_data)
@@ -513,12 +482,61 @@ def show_customer_diagnosis_page():
                     "操作": st.column_config.Column(width=120),
                 }
 
-                st.dataframe(
+                # 显示表格
+                edited_df = st.data_editor(
                     df,
-                    column_config=column_config,
+                    column_config={
+                        "客户姓名": st.column_config.Column(width=100),
+                        "意向": st.column_config.Column(width=100),
+                        "客户编号": st.column_config.Column(width=140),
+                        "预算": st.column_config.Column(width=100),
+                        "来源": st.column_config.Column(width=100),
+                        "定制空间": st.column_config.Column(width=150),
+                        "联系方式": st.column_config.Column(width=120),
+                        "创建时间": st.column_config.Column(width=150),
+                        "AI分析": st.column_config.Column(width=80),
+                        "操作": st.column_config.SelectboxColumn(
+                            "操作",
+                            width=150,
+                            options=["选择操作", "查看详情", "删除记录", "加载分析"],
+                            required=True
+                        ),
+                    },
                     hide_index=True,
                     use_container_width=True,
+                    key="customer_table_editor",
                 )
+
+                # 处理操作
+                for i, row in edited_df.iterrows():
+                    if i < len(customers):
+                        customer_id = customers[i].get("id")
+                        customer_name = customers[i].get("customer_name", "未知")
+                        action = row.get("操作")
+                        
+                        if action == "查看详情":
+                            st.session_state.selected_customer_idx = i
+                            st.rerun()
+                        elif action == "删除记录":
+                            if customer_id:
+                                try:
+                                    from core.database import db
+                                    db.delete("customers_v3", customer_id)
+                                    st.success(f"✅ 已删除客户「{customer_name}」")
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"删除失败：{e}")
+                            else:
+                                st.warning("无法获取客户ID")
+                            st.rerun()
+                        elif action == "加载分析":
+                            c = customers[i]
+                            st.session_state.diag_customer_data = c
+                            st.session_state.diag_card_result = c.get("ai_card_result", "")
+                            st.session_state.diag_detail_result = c.get("ai_detail_result", "")
+                            st.session_state.current_page = "客户洞察"
+                            st.success(f"✅ 已加载「{customer_name}」的数据，请切换到「AI 分析结果」标签")
+                            st.rerun()
 
                 # 详情展开（点击表格行后显示）
                 if st.session_state.get("selected_customer_idx") is not None:

@@ -180,19 +180,11 @@ class AIService:
             "next_followup_date": "下次跟进时间",
             # C 板块
             "style_preference": "风格倾向",
-            "material_preference": "材质倾向",
+            "appearance_preference": "外观质感倾向",
+            "material_type_preference": "板材材质倾向",
             "focus_points": "最关注点",
             "compare_brands": "是否对比品牌",
             "family_size": "家庭人数",
-            # D 板块
-            "quote_status": "报价情况",
-            "price_reaction": "价格反应",
-            "intent_level": "当前意向等级",
-            "core_objections": "核心异议",
-            "departure_status": "离店状态",
-            "departure_note": "离店备注",
-            "sales_note": "销售备注",
-            "special_needs": "特殊需求",
         }
         for key, label in label_map.items():
             val = data.get(key)
