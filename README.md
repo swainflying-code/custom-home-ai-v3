@@ -15,18 +15,6 @@
 ### 1. 数据库（Supabase）
 在 Supabase SQL Editor 执行 `supabase_schema_v3.sql`
 
-### 2. Streamlit Cloud 配置
-在 App Settings → Secrets 中填入：
-```toml
-SUPABASE_URL = "https://xxx.supabase.co"
-SUPABASE_KEY = "your-anon-key"
-SUPABASE_JWT_SECRET = "your-jwt-secret"
-MIMO_API_KEY = "your-mimo-key"
-MIMO_BASE_URL = "https://api.xiaomimimo.com/v1"
-MIMO_MODEL = "mimo-v2-pro"
-SECRET_KEY = "any-random-string"
-```
-
 ## 📁 项目结构
 ```
 custom-home-ai-v3/
